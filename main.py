@@ -1,5 +1,4 @@
 # Boards Against the Human Race Discord Bot
-# by: Simon W. (incomplete)
 
 from leavegame import leavegame1, leavegame2, leavegame3, leavegame4
 from game1 import startGame1, playcard1, choose_card1
