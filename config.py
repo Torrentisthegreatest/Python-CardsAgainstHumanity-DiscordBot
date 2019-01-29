@@ -2,6 +2,11 @@
 class Config():
 	maxplayerspergame = 0
 	maxnumberofgames = 0
+	adminroles = [
+		# "owner",
+
+		
+	]
 	def __init__(self):
 		#Change Presence
 		self.prestype = 0
