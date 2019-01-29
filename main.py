@@ -1,5 +1,6 @@
 # Boards Against the Human Race Discord Bot
-
+# by: Simon W. (incomplete)
+from config import config
 from leavegame import leavegame1, leavegame2, leavegame3, leavegame4
 from game1 import startGame1, playcard1, choose_card1
 from game2 import startGame2, playcard2, choose_card2
@@ -12,59 +13,51 @@ import os
 
 client = discord.Client()
 
-class Game:
-  is_started = False
-  is_closed = False
-  has_owner = False
-  Players = ["","",""]
-  Playercount = 0
-  dealer = ""
-  max_score = 0
-  cardsPlayed_inround = {}
-
-  def info(self):
-    print(str(self.is_started))
-    print(str(self.is_closed))
-    print(str(self.has_owner))
-    print(str(self.Players))
-    print(str(self.Playercount))
-    
-def helpmenu():
-  global helpmenu
-  helpmenu = '''\
-!newgame will make a new game
-!helpmenu will open the menu
-!join game1/game2/game3/game4 will add you to that game, if it is open.
-!cleargames will reset all games.
-!leavegame will remove you from a game.\
-'''.format(length='multi-line', ordinal='second')
-
 @client.event
 async def on_ready():
-    await client.change_presence(game=discord.Game(name="Torrent scream in frustration.", type=2))
+    await client.change_presence(game=discord.Game(name=config.prestext, type=config.prestype))
     print("I'm in")
     print(client.user)
     Init()
 
 def Init():
-  global game1, game2, game3, game4
+  global gamenum, game1, game2, game3, game4
+	for i in range(config.gamenum):
+		config.gamenum[i] = Game()
+
   game1 = Game()
   game2 = Game()
   game3 = Game()
   game4 = Game()
 
-@client.event
-async def on_message(message):
-    if message.content == "!newgame" and str(message.channel.name) == "game-lobby":
-        await newgame(message, game1, game2, game3, game4, client)
-        await client.send_message(destination=message.channel, content="Yeehaw, I'm not done yet!")
+class Game:
+  is_started = False
+  Players = []
+  Playercount = 0
+  dealer = ""
+  max_score = 0
+  cardsPlayed_inround = {}
 
-    elif message.content == "!cleargames" and str(message.channel.name) == "game-lobby":
-        Init()
-        await client.purge_from(channel=discord.utils.get(message.author.server.channels, id="518500991235260458"), limit=1000)
-        await client.purge_from(channel=discord.utils.get(message.author.server.channels, id="518501045425537024"), limit=1000)
-        await client.purge_from(channel=discord.utils.get(message.author.server.channels, id="518501089784627215"), limit=1000)
-        await client.purge_from(channel=discord.utils.get(message.author.server.channels, id="518501127247888421"), limit=1000)
+	def __init__(self):
+		#set channel
+		self.Maxplayers = config.maxplayerspergame
+			if client.user.server.roles.name not in config.adminroles:
+				print("There is an error with the config file, the adminroles is set incorrectly.")
+  
+	def helpmenu(self):
+		self.helpmenu = '''\
+		!newgame will make a new game
+		!helpmenu will open the menu
+		!join game # will add you to that game, if it is open.
+		!cleargames will reset all games. (admin roles only)
+		!leavegame will remove you from a game.\
+		'''.format(length='multi-line', ordinal='second')
+
+	@client.event
+	async def on_message(self, message):
+    if message.content == "!cleargames" and str(message.channel.name) == "game-lobby":
+        await client.purge_from(channel=discord.utils.get(message.author.server.channels, id=self.channel.id), limit=1000)
+				Init()
 
     elif message.content == "!helpmenu" and str(message.channel.name) == "game-lobby":
       helpmenu()
@@ -240,6 +233,7 @@ async def on_message(message):
           await playcard3(message, client, game3, card)
         elif str(message.channel) in str(game4.Players):
           await playcard4(message, client, game4, card)
+
 
         
 
